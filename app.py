@@ -8,9 +8,13 @@ visited_urls = set()
 
 
 def get_data(url):
-    html_text = requests.get(url).text
-    soup = BeautifulSoup(html_text, 'lxml')
-    return soup
+    try:
+        html_text = requests.get(url).text
+        soup = BeautifulSoup(html_text, 'lxml')
+        return soup
+    except requests.exceptions.RequestException as e:
+        print(f'Failed to fetch {url}')
+        return None
 
 
 def extract_images(soup, source_url, depth, image_data_list):
@@ -29,11 +33,13 @@ def extract_images(soup, source_url, depth, image_data_list):
 def scrape(url, cur_depth, limit_depth, image_data_list):
     if limit_depth == 0 or cur_depth == limit_depth:
         soup = get_data(url)
-        extract_images(soup, url, limit_depth, image_data_list)
+        if soup:
+            extract_images(soup, url, limit_depth, image_data_list)
         return
 
     soup = get_data(url)
-    extract_images(soup, url, cur_depth, image_data_list)
+    if soup:
+        extract_images(soup, url, cur_depth, image_data_list)
 
     # get all links in page
     links = soup.findAll('a')
