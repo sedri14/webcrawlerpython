@@ -4,6 +4,8 @@ import requests
 import json
 import argparse
 
+visited_urls = set()
+
 
 def get_data(url):
     html_text = requests.get(url).text
@@ -21,6 +23,7 @@ def extract_images(soup, source_url, depth, image_data_list):
             "depth": depth
         }
         image_data_list.append(img_data)
+        print(img_data)
 
 
 def scrape(url, cur_depth, limit_depth, image_data_list):
@@ -37,8 +40,9 @@ def scrape(url, cur_depth, limit_depth, image_data_list):
     for link in links:
         relative_url = link['href']
         absolute_url = urljoin(url, relative_url)
-        # todo: check for previously visited urls
-        scrape(absolute_url, cur_depth + 1, limit_depth, image_data_list)
+        if absolute_url not in visited_urls:
+            visited_urls.add(absolute_url)
+            scrape(absolute_url, cur_depth + 1, limit_depth, image_data_list)
 
 
 def main():
