@@ -2,9 +2,7 @@ from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 import requests
 import json
-
-
-URL = 'https://www.geeksforgeeks.org/image-scraping-with-python/'
+import argparse
 
 
 def get_data(url):
@@ -43,9 +41,14 @@ def scrape(url, cur_depth, limit_depth, image_data_list):
         scrape(absolute_url, cur_depth + 1, limit_depth, image_data_list)
 
 
-if __name__ == '__main__':
+def main():
+    parser = argparse.ArgumentParser(description="Web Crawler")
+    parser.add_argument("url", type=str, help="Url")
+    parser.add_argument("depth", type=int, help="Depth")
+    args = parser.parse_args()
+
     img_data_list = []
-    scrape(URL, 0, 1, img_data_list)
+    scrape(args.url, 0, args.depth, img_data_list)
 
     # write results to a json file
     data_to_save = {
@@ -53,4 +56,7 @@ if __name__ == '__main__':
     }
     with open('results.json', 'w') as json_file:
         json.dump(data_to_save, json_file, indent=4)
-    print('finished')
+
+
+if __name__ == "__main__":
+    main()
